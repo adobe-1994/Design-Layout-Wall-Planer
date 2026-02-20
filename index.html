@@ -1,0 +1,1571 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Thiết kế bố cục</title>
+  <!-- Font Awesome cho icon -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    :root {
+      --color-bg-base: #0f172a;
+      --color-bg-elevated: #1e293b;
+      --color-bg-surface: #334155;
+      --color-text-primary: #f1f5f9;
+      --color-text-secondary: #94a3b8;
+      --color-primary: #38bdf8;
+      --color-primary-hover: #0ea5e9;
+      --color-border: rgba(148, 163, 184, 0.2);
+      --color-success: #22c55e;
+      --color-error: #ef4444;
+      --color-guide: #ec4899;
+      --color-warning: #f59e0b;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      background: var(--color-bg-base);
+      color: var(--color-text-primary);
+      display: flex;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    /* Sidebar Styling */
+    .sidebar {
+      width: 360px;
+      background: var(--color-bg-base);
+      border-right: 1px solid var(--color-border);
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      flex-shrink: 0;
+      z-index: 10;
+    }
+
+    .sidebar-header {
+      padding: 15px 20px;
+      border-bottom: 1px solid var(--color-border);
+      background: var(--color-bg-base);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    
+    .sidebar-header h1 {
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--color-primary);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin: 0;
+    }
+
+    .header-tools {
+      display: flex;
+      gap: 6px;
+    }
+
+    .header-btn {
+      background: var(--color-bg-surface);
+      border: 1px solid var(--color-border);
+      color: var(--color-text-primary);
+      border-radius: 6px;
+      width: 32px;
+      height: 32px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s;
+    }
+
+    .header-btn:hover:not(:disabled) {
+      border-color: var(--color-text-secondary);
+      color: var(--color-primary);
+    }
+
+    .header-btn:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+
+    .sidebar-content {
+      flex: 1;
+      overflow-y: auto;
+      padding: 20px;
+    }
+    .sidebar-content::-webkit-scrollbar { width: 6px; }
+    .sidebar-content::-webkit-scrollbar-thumb { background: var(--color-bg-surface); border-radius: 3px; }
+
+    /* Canvas Area */
+    .canvas-container {
+      flex: 1;
+      position: relative;
+      background: #0f172a;
+      overflow: hidden;
+      cursor: grab;
+      touch-action: none; /* Prevent browser handling of touch gestures */
+    }
+
+    .canvas-container:active {
+      cursor: grabbing;
+    }
+    
+    /* Image Edit Mode Cursor Override */
+    .canvas-container.img-edit-mode { cursor: crosshair; }
+    .canvas-container.img-edit-mode:active { cursor: crosshair; }
+
+    canvas {
+      display: block;
+      width: 100%;
+      height: 100%;
+    }
+
+    /* Panels */
+    .panel {
+      background: var(--color-bg-elevated);
+      border: 1px solid var(--color-border);
+      border-radius: 8px;
+      padding: 16px;
+      margin-bottom: 16px;
+    }
+
+    .section-title {
+      font-size: 14px;
+      text-transform: uppercase;
+      font-weight: 600;
+      margin-bottom: 12px;
+      color: var(--color-text-secondary);
+    }
+
+    /* UI Elements */
+    .form-group { margin-bottom: 12px; }
+    .form-label { display: block; font-size: 12px; color: var(--color-text-secondary); margin-bottom: 6px; }
+    .form-control {
+      width: 100%; padding: 8px 12px;
+      background: var(--color-bg-base);
+      border: 1px solid var(--color-border);
+      border-radius: 6px;
+      color: var(--color-text-primary);
+      font-size: 14px;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    .form-control:focus {
+      outline: none;
+      border-color: var(--color-primary);
+      box-shadow: 0 0 0 2px rgba(56, 189, 248, 0.2);
+    }
+    .input-group { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+
+    .btn {
+      padding: 10px 16px; border: none; border-radius: 6px; font-size: 13px;
+      cursor: pointer; font-weight: 600; display: inline-flex;
+      align-items: center; justify-content: center; gap: 6px;
+      transition: all 0.2s;
+    }
+    .btn-primary { background: var(--color-primary); color: #0f172a; }
+    .btn-primary:hover:not(:disabled) { background: var(--color-primary-hover); }
+    .btn-secondary { background: var(--color-bg-surface); color: var(--color-text-primary); border: 1px solid var(--color-border); }
+    .btn-secondary:hover:not(:disabled) { background: var(--color-bg-base); border-color: var(--color-text-secondary); }
+    .btn-danger { background: rgba(239, 68, 68, 0.2); color: #f87171; }
+    .btn-danger:hover:not(:disabled) { background: rgba(239, 68, 68, 0.35); }
+    .btn-warning { background: rgba(245, 158, 11, 0.2); color: var(--color-warning); border: 1px solid var(--color-warning); }
+    .btn-warning:hover:not(:disabled) { background: var(--color-warning); color: #0f172a; }
+    
+    .btn-group { display: flex; gap: 8px; flex-wrap: wrap; }
+    .btn-group .btn { flex: 1; }
+    .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+    .toggle-switch { display: flex; align-items: center; cursor: pointer; font-size: 13px; }
+    .toggle-switch input { display: none; }
+    .toggle-slider {
+      width: 36px; height: 20px; background: var(--color-bg-surface);
+      border-radius: 20px; position: relative; margin-right: 10px;
+      transition: 0.3s; border: 1px solid var(--color-border);
+    }
+    .toggle-slider::before {
+      content: ""; position: absolute; width: 16px; height: 16px;
+      border-radius: 50%; background: var(--color-text-secondary);
+      top: 1px; left: 1px; transition: 0.3s;
+    }
+    .toggle-switch input:checked + .toggle-slider { background: rgba(56, 189, 248, 0.2); border-color: var(--color-primary); }
+    .toggle-switch input:checked + .toggle-slider::before { transform: translateX(16px); background: var(--color-primary); }
+
+    .toggle-switch.warning input:checked + .toggle-slider { background: rgba(245, 158, 11, 0.2); border-color: var(--color-warning); }
+    .toggle-switch.warning input:checked + .toggle-slider::before { background: var(--color-warning); }
+
+    /* Manual Move Row Style */
+    .manual-move-row {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        margin-top: 12px;
+        padding-top: 12px;
+        border-top: 1px solid var(--color-border);
+    }
+    .manual-move-row .form-control { text-align: center; width: 100%; }
+    .manual-move-row .btn { width: 36px; height: 36px; padding: 0; flex: 0 0 36px; }
+    
+    /* Range Slider */
+    input[type=range] {
+      -webkit-appearance: none;
+      width: 100%;
+      background: transparent;
+    }
+    input[type=range]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      height: 16px; width: 16px;
+      border-radius: 50%;
+      background: var(--color-primary);
+      cursor: pointer;
+      margin-top: -6px;
+    }
+    input[type=range]::-webkit-slider-runnable-track {
+      width: 100%; height: 4px;
+      cursor: pointer;
+      background: var(--color-bg-surface);
+      border-radius: 2px;
+    }
+
+    /* Notification Toast */
+    #zoom-indicator {
+        position: absolute;
+        bottom: 20px; right: 20px;
+        background: rgba(0,0,0,0.6);
+        color: white;
+        padding: 5px 10px; border-radius: 4px;
+        font-size: 12px; pointer-events: none;
+        opacity: 0; transition: opacity 0.3s;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Sidebar -->
+  <div class="sidebar">
+    <div class="sidebar-header">
+      <h1><i class="fas fa-th-large"></i> Thiết kế bố cục</h1>
+      <div class="header-tools">
+        <button class="header-btn" id="undoBtn" disabled title="Hoàn tác (Ctrl+Z)"><i class="fas fa-undo"></i></button>
+        <button class="header-btn" id="redoBtn" disabled title="Làm lại (Ctrl+Y)"><i class="fas fa-redo"></i></button>
+      </div>
+    </div>
+    
+    <div class="sidebar-content">
+      <!-- 1. Wall Settings -->
+      <div class="panel">
+        <h2 class="section-title">1. Kích thước tường (cm)</h2>
+        <div class="input-group">
+            <div class="form-group">
+                <label class="form-label">Ngang</label>
+                <input type="number" class="form-control" id="wallWidth" value="300" min="50" max="2000">
+            </div>
+            <div class="form-group">
+                <label class="form-label">Cao</label>
+                <input type="number" class="form-control" id="wallHeight" value="250" min="50" max="2000">
+            </div>
+        </div>
+        <button class="btn btn-primary" id="updateWallBtn" style="width: 100%"><i class="fas fa-sync-alt"></i> Cập nhật</button>
+      </div>
+
+      <!-- 2. Bulk Create -->
+      <div class="panel">
+        <h2 class="section-title">2. Thiết lập bộ tranh</h2>
+        <div class="form-group">
+          <label class="form-label">Số lượng tranh</label>
+          <input type="number" class="form-control" id="picCount" value="3" min="1">
+        </div>
+        <div class="input-group">
+          <div class="form-group">
+            <label class="form-label">Rộng 1 tranh</label>
+            <input type="number" class="form-control" id="commonW" value="50" min="10">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Cao 1 tranh</label>
+            <input type="number" class="form-control" id="commonH" value="70" min="10">
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Khoảng cách (cm)</label>
+          <input type="number" class="form-control" id="picGap" value="10" min="0">
+        </div>
+        <div class="btn-group">
+          <button class="btn btn-primary" id="createBtn"><i class="fas fa-sync-alt"></i> Cập nhật</button>
+          <button class="btn btn-secondary" id="resetBtn"><i class="fas fa-trash"></i> Xóa hết</button>
+        </div>
+      </div>
+
+      <!-- 3. Furniture -->
+      <div class="panel">
+        <h2 class="section-title">3. Vật thể đối chứng (Sofa/Kệ)</h2>
+        <label class="toggle-switch" style="margin-bottom: 12px;">
+            <input type="checkbox" id="showFurniture" checked>
+            <span class="toggle-slider"></span>
+            <span>Hiển thị vật thể</span>
+        </label>
+        <div class="input-group">
+            <div class="form-group">
+                <label class="form-label">Rộng (cm)</label>
+                <input type="number" class="form-control" id="furnW" value="200" min="10">
+            </div>
+            <div class="form-group">
+                <label class="form-label">Cao (cm)</label>
+                <input type="number" class="form-control" id="furnH" value="80" min="10">
+            </div>
+        </div>
+        <div class="form-group" style="margin-top: 8px; border-top: 1px dashed var(--color-border); padding-top: 12px;">
+            <label class="form-label" style="color: var(--color-primary);">Khoảng cách từ vật thể đến tranh (cm)</label>
+            <div style="display: flex; gap: 8px;">
+                <input type="number" class="form-control" id="furnDist" value="20">
+                <button class="btn btn-primary" id="alignFurnBtn" title="Tự động căn chỉnh" style="white-space: nowrap;">
+                    <i class="fas fa-arrow-down"></i> Áp dụng
+                </button>
+            </div>
+        </div>
+      </div>
+
+      <!-- 4. Edit Selected -->
+      <div class="panel" id="editPanel"> 
+        <h2 class="section-title">4. Tinh chỉnh tranh</h2>
+        
+        <div class="form-group" style="display: flex; align-items: center; gap: 10px; margin-bottom: 12px; border-bottom: 1px solid var(--color-border); padding-bottom: 12px;">
+            <label class="form-label" style="margin: 0; min-width: 80px; color: var(--color-primary);">Chọn STT:</label>
+            <input type="number" class="form-control" id="selectPicIndex" min="1" placeholder="Nhập số..." style="text-align: center; font-weight: bold;">
+        </div>
+
+        <button class="btn btn-primary" id="cloneBtn" style="width: 100%; margin-bottom: 12px; background: var(--color-bg-surface); border: 1px solid var(--color-primary); color: var(--color-primary);">
+            <i class="fas fa-copy"></i> Tạo thêm từ tranh này
+        </button>
+        <div class="input-group">
+          <div class="form-group">
+            <label class="form-label">Ngang</label>
+            <input type="number" class="form-control" id="picW">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Cao</label>
+            <input type="number" class="form-control" id="picH">
+          </div>
+        </div>
+        <div class="btn-group" style="margin-bottom: 12px;">
+            <button class="btn btn-secondary" id="rotateBtn"><i class="fas fa-sync-alt"></i> Xoay</button>
+            <button class="btn btn-danger" id="deleteBtn"><i class="fas fa-trash-alt"></i> Xóa</button>
+        </div>
+        
+        <div class="manual-move-row">
+            <div style="flex: 1;">
+                <input type="number" class="form-control" id="moveStep" value="1" min="0.1" step="0.1" title="Bước di chuyển (cm)" placeholder="Bước">
+            </div>
+            <button class="btn btn-secondary" id="navLeft" title="Trái"><i class="fas fa-arrow-left"></i></button>
+            <button class="btn btn-secondary" id="navUp" title="Lên"><i class="fas fa-arrow-up"></i></button>
+            <button class="btn btn-secondary" id="navDown" title="Xuống"><i class="fas fa-arrow-down"></i></button>
+            <button class="btn btn-secondary" id="navRight" title="Phải"><i class="fas fa-arrow-right"></i></button>
+        </div>
+      </div>
+
+      <!-- 5. Image Upload & Edit -->
+      <div class="panel">
+        <h2 class="section-title"><i class="fas fa-image"></i> 5. Quản lý hình ảnh</h2>
+        
+        <input type="file" id="imageUpload" accept="image/*" style="display: none;">
+        
+        <div class="btn-group" style="margin-bottom: 12px;">
+            <button class="btn btn-secondary" id="uploadBtn" style="padding: 12px 10px; font-size: 14px;">
+                <i class="fas fa-upload" style="font-size: 1.2em;"></i> Tải ảnh
+            </button>
+            <button class="btn btn-secondary" id="editImgBtn" style="padding: 12px 10px; font-size: 14px;">
+                <i class="fas fa-tools" style="font-size: 1.2em;"></i> Sửa ảnh
+            </button>
+        </div>
+
+        <div style="background: rgba(0,0,0,0.2); padding: 10px; border-radius: 6px; margin-bottom: 12px; border: 1px solid var(--color-border);">
+            <label class="toggle-switch" style="font-weight: 600;">
+                <input type="checkbox" id="globalImgToggle">
+                <span class="toggle-slider"></span>
+                <span style="color: var(--color-text-primary);">Chế độ 1 ảnh cho nhiều bức</span>
+            </label>
+        </div>
+
+        <div class="form-group" id="imgScaleGroup" style="opacity: 0.5; pointer-events: none;">
+            <label class="form-label" style="display: flex; justify-content: space-between;">
+                <span>Zoom ảnh</span>
+                <span id="imgScaleVal">100%</span>
+            </label>
+            <input type="range" id="imgScaleSlider" min="0.1" max="5" step="0.05" value="1">
+            <div class="input-group" style="margin-top: 12px;">
+                <button class="btn btn-secondary" id="resetImgBtn">Reset vị trí</button>
+                <button class="btn btn-danger" id="deleteImgBtn">Xóa ảnh</button>
+            </div>
+        </div>
+      </div>
+
+      <!-- 6. Options -->
+      <div class="panel">
+        <h2 class="section-title">Công cụ & Hiển thị</h2>
+        <div style="background: rgba(56, 189, 248, 0.1); padding: 10px; border-radius: 6px; margin-bottom: 12px; border: 1px solid rgba(56, 189, 248, 0.2);">
+            <label class="toggle-switch" style="font-weight: 600;">
+                <input type="checkbox" id="moveAllGroup">
+                <span class="toggle-slider"></span>
+                <span style="color: var(--color-primary);">Di chuyển cả bộ</span>
+            </label>
+        </div>
+        <button class="btn btn-secondary" id="centerAllBtn" style="width: 100%; margin-bottom: 12px;">
+            <i class="fas fa-align-center"></i> Tự động căn giữa tường
+        </button>
+        <button class="btn btn-secondary" id="resetViewBtn" style="width: 100%; margin-bottom: 12px;" title="Phím tắt: Ctrl + 0">
+            <i class="fas fa-compress-arrows-alt"></i> Fit View
+        </button>
+        <label class="toggle-switch" style="margin-bottom: 8px;">
+          <input type="checkbox" id="showDimensions" checked>
+          <span class="toggle-slider"></span>
+          <span>Hiện thông số trong tranh</span>
+        </label>
+        <label class="toggle-switch" style="margin-bottom: 8px;">
+          <input type="checkbox" id="showWallInfo" checked>
+          <span class="toggle-slider"></span>
+          <span>Hiện thông tin trên tường</span>
+        </label>
+        <label class="toggle-switch">
+          <input type="checkbox" id="smartGuides" checked>
+          <span class="toggle-slider"></span>
+          <span>Smart Guides</span>
+        </label>
+      </div>
+
+      <!-- Export -->
+      <div class="panel" style="margin-bottom: 0;">
+        <h2 class="section-title">Xuất file</h2>
+        <div class="btn-group">
+          <button class="btn btn-primary" id="exportJpegBtn">JPEG</button>
+          <button class="btn btn-primary" id="exportPngBtn">PNG</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Canvas -->
+  <div class="canvas-container" id="canvasContainer">
+    <canvas id="canvas"></canvas>
+    <div id="zoom-indicator">Zoom: 100%</div>
+  </div>
+
+  <script>
+    /** App Core State **/
+    const canvas = document.getElementById('canvas');
+    const ctx = canvas.getContext('2d');
+    const container = document.getElementById('canvasContainer');
+
+    const app = {
+      w: 300, 
+      h: 250, 
+      scale: 1, 
+      panX: 0, 
+      panY: 0  
+    };
+
+    let pictures = [];
+    let selectedPic = null;
+    let furniture = { w: 200, h: 80, visible: true, distance: 20 };
+
+    // Image System State
+    const imgCache = new Map(); 
+    let isGlobalMaskMode = false;
+    let globalImgData = null; 
+    let isImgEditMode = false;
+    let isDraggingImg = false;
+
+    // Interaction State
+    let isDragging = false; 
+    let isPanning = false; 
+    let dragStart = { x: 0, y: 0 };
+    let panStart = { x: 0, y: 0 }; 
+    let initialPositions = new Map(); 
+
+    // View Options
+    let showDimensions = true;
+    let showWallInfo = true; 
+    let enableSmartGuides = true;
+    let moveAllGroup = false;
+    let activeGuides = [];
+
+    const history = { stack: [], current: -1, max: 20 }; 
+    let zoomTimeout = null; 
+
+    /* =========================================
+       INITIALIZATION & EVENTS
+       ========================================= */
+    function init() {
+        createPics(3, 50, 70, 10);
+        updateEditPanel(); 
+        
+        window.addEventListener('resize', () => {
+             resizeCanvas();
+             fitWallToScreen(); 
+             drawLoop();
+        });
+        resizeCanvas();
+        fitWallToScreen();
+        
+        // Desktop Events
+        canvas.addEventListener('mousedown', onMouseDown);
+        window.addEventListener('mousemove', onMouseMove);
+        window.addEventListener('mouseup', onMouseUp);
+        canvas.addEventListener('wheel', onWheel, { passive: false });
+        
+        // Touch/Mobile Events (Fix 4)
+        setupTouchEvents();
+        
+        // Keyboard Events
+        document.addEventListener('keydown', onKeyDown);
+
+        setupUIControls();
+        requestAnimationFrame(drawLoop);
+        saveState();
+    }
+
+    function resizeCanvas() {
+        const dpr = window.devicePixelRatio || 1;
+        canvas.width = container.clientWidth * dpr;
+        canvas.height = container.clientHeight * dpr;
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    }
+
+    function fitWallToScreen() {
+        const pad = 60;
+        const availableW = container.clientWidth - pad;
+        const availableH = container.clientHeight - pad;
+        
+        const scaleW = availableW / app.w;
+        const scaleH = availableH / app.h;
+        app.scale = Math.min(scaleW, scaleH); 
+        app.baseScale = app.scale; 
+        
+        const wallPixelW = app.w * app.scale;
+        const wallPixelH = app.h * app.scale;
+        
+        app.panX = (container.clientWidth - wallPixelW) / 2;
+        app.panY = (container.clientHeight - wallPixelH) / 2;
+        
+        showZoomLevel();
+    }
+
+    function setupTouchEvents() {
+        const getTouchPos = (e) => {
+            const touch = e.touches[0] || e.changedTouches[0];
+            return { clientX: touch.clientX, clientY: touch.clientY };
+        };
+
+        canvas.addEventListener('touchstart', (e) => {
+            if(e.touches.length === 1) onMouseDown(getTouchPos(e));
+        }, {passive: false});
+
+        canvas.addEventListener('touchmove', (e) => {
+            if(e.touches.length === 1) {
+                e.preventDefault(); // Ngăn trình duyệt cuộn dọc trang
+                onMouseMove(getTouchPos(e));
+            }
+        }, {passive: false});
+
+        canvas.addEventListener('touchend', (e) => {
+            onMouseUp();
+        });
+    }
+
+    function setupUIControls() {
+        const updateWall = () => { 
+            let w = parseInt(document.getElementById('wallWidth').value);
+            let h = parseInt(document.getElementById('wallHeight').value);
+            app.w = isNaN(w) || w < 50 ? 300 : w; 
+            app.h = isNaN(h) || h < 50 ? 250 : h;
+            document.getElementById('wallWidth').value = app.w;
+            document.getElementById('wallHeight').value = app.h;
+            fitWallToScreen(); saveState();
+        };
+        document.getElementById('updateWallBtn').onclick = updateWall;
+        ['wallWidth', 'wallHeight'].forEach(id => {
+            document.getElementById(id).addEventListener('keyup', (e) => { if(e.key === 'Enter') updateWall(); });
+        });
+
+        const updatePics = () => {
+            let count = parseInt(document.getElementById('picCount').value);
+            let w = parseInt(document.getElementById('commonW').value);
+            let h = parseInt(document.getElementById('commonH').value);
+            let gap = parseInt(document.getElementById('picGap').value);
+            
+            count = isNaN(count) || count < 1 ? 1 : count;
+            w = isNaN(w) || w < 10 ? 40 : w;
+            h = isNaN(h) || h < 10 ? 60 : h;
+            gap = isNaN(gap) || gap < 0 ? 0 : gap;
+
+            document.getElementById('picCount').value = count;
+            document.getElementById('commonW').value = w;
+            document.getElementById('commonH').value = h;
+            document.getElementById('picGap').value = gap;
+            createPics(count, w, h, gap); saveState();
+        };
+        document.getElementById('createBtn').onclick = updatePics;
+        ['picCount', 'commonW', 'commonH', 'picGap'].forEach(id => {
+            document.getElementById(id).addEventListener('keyup', (e) => { if(e.key === 'Enter') updatePics(); });
+        });
+        
+        document.getElementById('resetBtn').onclick = () => {
+            if(confirm('Xóa hết tranh?')) { pictures = []; selectedPic = null; isGlobalMaskMode = false; globalImgData = null; updateEditPanel(); saveState(); }
+        };
+
+        const updateFurn = () => {
+            let fw = parseFloat(document.getElementById('furnW').value);
+            let fh = parseFloat(document.getElementById('furnH').value);
+            let fd = parseFloat(document.getElementById('furnDist').value);
+            
+            furniture.w = isNaN(fw) || fw < 10 ? 200 : fw;
+            furniture.h = isNaN(fh) || fh < 10 ? 80 : fh;
+            furniture.distance = isNaN(fd) ? 20 : fd; 
+            furniture.visible = document.getElementById('showFurniture').checked;
+            
+            document.getElementById('furnW').value = furniture.w;
+            document.getElementById('furnH').value = furniture.h;
+            document.getElementById('furnDist').value = furniture.distance;
+            saveState();
+        };
+        ['furnW','furnH', 'showFurniture'].forEach(id => document.getElementById(id).addEventListener('change', updateFurn));
+        document.getElementById('furnDist').addEventListener('keyup', (e) => {
+            if(e.key === 'Enter') { updateFurn(); alignArtToFurniture(); }
+        });
+        document.getElementById('alignFurnBtn').onclick = alignArtToFurniture;
+
+        document.getElementById('centerAllBtn').onclick = centerAllContent;
+        document.getElementById('resetViewBtn').onclick = fitWallToScreen;
+
+        document.getElementById('picW').onchange = updateSelectedSize;
+        document.getElementById('picH').onchange = updateSelectedSize;
+        
+        const picIndexInput = document.getElementById('selectPicIndex');
+        const handleIndexSelect = () => {
+            const val = parseInt(picIndexInput.value);
+            if (isNaN(val) || val < 1 || val > pictures.length) {
+                picIndexInput.value = selectedPic ? pictures.indexOf(selectedPic) + 1 : '';
+                return;
+            }
+            const idx = val - 1;
+            if (pictures[idx]) { selectPicture(pictures[idx]); centerViewOnPic(pictures[idx]); }
+        };
+        picIndexInput.addEventListener('change', handleIndexSelect);
+        picIndexInput.addEventListener('keyup', (e) => { if(e.key === 'Enter') handleIndexSelect(); });
+
+        document.getElementById('cloneBtn').onclick = cloneSelectedPic;
+        document.getElementById('deleteBtn').onclick = () => {
+            if(!selectedPic) return;
+            pictures = pictures.filter(p => p !== selectedPic); 
+            selectedPic = null; 
+            if(pictures.length === 0) isGlobalMaskMode = false; 
+            updateEditPanel(); saveState();
+        };
+        document.getElementById('rotateBtn').onclick = () => {
+            if(!selectedPic) return;
+            [selectedPic.w, selectedPic.h] = [selectedPic.h, selectedPic.w];
+            updateEditPanel(); saveState();
+        };
+
+        const move = (dx, dy) => moveSelection(dx, dy);
+        document.getElementById('navUp').onclick = () => move(0, -1);
+        document.getElementById('navDown').onclick = () => move(0, 1);
+        document.getElementById('navLeft').onclick = () => move(-1, 0);
+        document.getElementById('navRight').onclick = () => move(1, 0);
+
+        document.getElementById('showDimensions').onchange = (e) => showDimensions = e.target.checked;
+        document.getElementById('showWallInfo').onchange = (e) => showWallInfo = e.target.checked;
+        document.getElementById('smartGuides').onchange = (e) => enableSmartGuides = e.target.checked;
+        document.getElementById('moveAllGroup').onchange = (e) => moveAllGroup = e.target.checked;
+
+        document.getElementById('uploadBtn').onclick = () => {
+            if (isGlobalMaskMode && pictures.length === 0) { alert('Cần ít nhất 1 bức tranh để tạo set!'); return; }
+            if (!isGlobalMaskMode && !selectedPic) { alert('Vui lòng chọn 1 bức tranh trước!'); return; }
+            document.getElementById('imageUpload').click();
+        };
+
+        document.getElementById('editImgBtn').onclick = () => {
+            isImgEditMode = !isImgEditMode;
+            updateEditPanel();
+        };
+
+        document.getElementById('globalImgToggle').onchange = (e) => {
+            isGlobalMaskMode = e.target.checked;
+            updateEditPanel(); saveState();
+        };
+
+        document.getElementById('imageUpload').onchange = handleFileUpload;
+
+        const imgScaleSlider = document.getElementById('imgScaleSlider');
+        imgScaleSlider.oninput = (e) => {
+            const val = parseFloat(e.target.value);
+            document.getElementById('imgScaleVal').innerText = Math.round(val * 100) + '%';
+            if (isGlobalMaskMode && globalImgData) {
+                globalImgData.scale = globalImgData.baseScale * val;
+            } else if (selectedPic && selectedPic.imgData) {
+                selectedPic.imgData.scale = selectedPic.imgData.baseScale * val;
+            }
+        };
+        imgScaleSlider.onchange = () => saveState();
+
+        document.getElementById('resetImgBtn').onclick = () => {
+            if (isGlobalMaskMode && globalImgData) {
+                globalImgData.offsetX = 0; globalImgData.offsetY = 0; globalImgData.scale = globalImgData.baseScale;
+            } else if (selectedPic && selectedPic.imgData) {
+                selectedPic.imgData.offsetX = 0; selectedPic.imgData.offsetY = 0; selectedPic.imgData.scale = selectedPic.imgData.baseScale;
+            }
+            updateEditPanel(); saveState();
+        };
+
+        document.getElementById('deleteImgBtn').onclick = () => {
+            if (isGlobalMaskMode) globalImgData = null;
+            else if (selectedPic) selectedPic.imgData = null;
+            updateEditPanel(); saveState();
+        };
+
+        document.getElementById('undoBtn').onclick = undo;
+        document.getElementById('redoBtn').onclick = redo;
+        document.getElementById('exportJpegBtn').onclick = () => downloadImage('jpeg');
+        document.getElementById('exportPngBtn').onclick = () => downloadImage('png');
+    }
+
+    /* =========================================
+       IMAGE HANDLING LOGIC
+       ========================================= */
+    function handleFileUpload(e) {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = function(event) {
+            const originalBase64 = event.target.result;
+            const img = new Image();
+            img.onload = function() {
+                const MAX_SIZE = 1920; 
+                let targetW = img.width;
+                let targetH = img.height;
+
+                if (targetW > MAX_SIZE || targetH > MAX_SIZE) {
+                    const ratio = Math.min(MAX_SIZE / targetW, MAX_SIZE / targetH);
+                    targetW = Math.round(targetW * ratio);
+                    targetH = Math.round(targetH * ratio);
+                }
+
+                const tempCanvas = document.createElement('canvas');
+                tempCanvas.width = targetW; tempCanvas.height = targetH;
+                const tCtx = tempCanvas.getContext('2d');
+                tCtx.drawImage(img, 0, 0, targetW, targetH);
+
+                const isPng = file.type === 'image/png';
+                const mimeType = isPng ? 'image/png' : 'image/jpeg';
+                const optimizedBase64 = tempCanvas.toDataURL(mimeType, isPng ? undefined : 0.8);
+
+                const finalImg = new Image();
+                finalImg.onload = function() {
+                    imgCache.set(optimizedBase64, finalImg);
+
+                    if (!isGlobalMaskMode && selectedPic) {
+                        const baseScale = Math.max(selectedPic.w / finalImg.width, selectedPic.h / finalImg.height);
+                        selectedPic.imgData = { base64: optimizedBase64, scale: baseScale, baseScale: baseScale, offsetX: 0, offsetY: 0 };
+                    } else if (isGlobalMaskMode) {
+                        pictures.forEach(p => p.imgData = null);
+                        const bounds = getSetBounds();
+                        const setW = bounds.maxX - bounds.minX;
+                        const setH = bounds.maxY - bounds.minY;
+                        const baseScale = Math.max(setW / finalImg.width, setH / finalImg.height);
+                        globalImgData = { base64: optimizedBase64, scale: baseScale, baseScale: baseScale, offsetX: 0, offsetY: 0 };
+                    }
+
+                    isImgEditMode = true;
+                    updateEditPanel();
+                    saveState();
+                };
+                finalImg.src = optimizedBase64;
+            };
+            img.src = originalBase64;
+        };
+        reader.readAsDataURL(file);
+        e.target.value = ''; 
+    }
+
+    function getSetBounds() {
+        if(pictures.length === 0) return {minX:0, minY:0, maxX:0, maxY:0};
+        let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+        pictures.forEach(p => {
+            if (p.x < minX) minX = p.x; if (p.y < minY) minY = p.y;
+            if (p.x + p.w > maxX) maxX = p.x + p.w; if (p.y + p.h > maxY) maxY = p.y + p.h;
+        });
+        return {minX, minY, maxX, maxY};
+    }
+
+    function ensureImageLoaded(base64) {
+        if (!base64) return null;
+        if (imgCache.has(base64)) return imgCache.get(base64);
+        const img = new Image(); img.src = base64; imgCache.set(base64, img);
+        return img; 
+    }
+
+    /* =========================================
+       ZOOM & PAN LOGIC
+       ========================================= */
+    function toWorld(screenX, screenY) {
+        return {
+            x: (screenX - app.panX) / app.scale,
+            y: (screenY - app.panY) / app.scale
+        };
+    }
+
+    function onWheel(e) {
+        e.preventDefault();
+        const rect = canvas.getBoundingClientRect();
+        const mouseX = e.clientX - rect.left;
+        const mouseY = e.clientY - rect.top;
+        const delta = e.deltaY < 0 ? 1 : -1;
+
+        if (isImgEditMode) {
+            const zoomIntensity = 0.05;
+            if (isGlobalMaskMode && globalImgData) {
+                globalImgData.scale *= (1 + delta * zoomIntensity);
+                globalImgData.scale = Math.max(globalImgData.baseScale * 0.1, Math.min(globalImgData.baseScale * 5, globalImgData.scale));
+                updateEditPanel();
+                return;
+            }
+
+            const m = toWorld(mouseX, mouseY);
+            for(let i=pictures.length-1; i>=0; i--) {
+                const p = pictures[i];
+                if(m.x >= p.x && m.x <= p.x + p.w && m.y >= p.y && m.y <= p.y + p.h && p.imgData) {
+                    p.imgData.scale *= (1 + delta * zoomIntensity);
+                    p.imgData.scale = Math.max(p.imgData.baseScale * 0.1, Math.min(p.imgData.baseScale * 5, p.imgData.scale));
+                    if(selectedPic === p) updateEditPanel();
+                    return;
+                }
+            }
+            return; 
+        }
+
+        const zoomIntensity = 0.1;
+        const worldPos = toWorld(mouseX, mouseY);
+        const newScale = app.scale * (1 + delta * zoomIntensity);
+        
+        if (newScale < 0.2 || newScale > 10) return;
+
+        app.scale = newScale;
+        app.panX = mouseX - worldPos.x * app.scale;
+        app.panY = mouseY - worldPos.y * app.scale;
+
+        showZoomLevel();
+    }
+
+    function showZoomLevel() {
+        const el = document.getElementById('zoom-indicator');
+        if (!el) return;
+        const pct = app.baseScale ? Math.round((app.scale / app.baseScale) * 100) : Math.round(app.scale * 100);
+        el.innerText = `Zoom: ${pct}%`;
+        el.style.opacity = 1;
+        clearTimeout(zoomTimeout);
+        zoomTimeout = setTimeout(() => el.style.opacity = 0, 1500);
+    }
+
+    /* =========================================
+       MOUSE INTERACTIONS
+       ========================================= */
+    function onMouseDown(e) {
+        const rect = canvas.getBoundingClientRect();
+        const mouseX = e.clientX - rect.left;
+        const mouseY = e.clientY - rect.top;
+        const m = toWorld(mouseX, mouseY);
+
+        let clicked = null;
+        
+        const hitList = pictures.map((p, i) => ({p, i})).sort((a, b) => {
+            const zDiff = (b.p.z || 0) - (a.p.z || 0);
+            return zDiff !== 0 ? zDiff : b.i - a.i;
+        }).map(x => x.p);
+
+        for(let p of hitList) {
+            if(m.x >= p.x && m.x <= p.x + p.w && m.y >= p.y && m.y <= p.y + p.h) {
+                clicked = p; break;
+            }
+        }
+
+        if (isImgEditMode) {
+            if (clicked) {
+                if (isGlobalMaskMode && globalImgData) {
+                    isDraggingImg = true;
+                    selectPicture(clicked);
+                } else if (!isGlobalMaskMode && clicked.imgData) {
+                    isDraggingImg = true;
+                    selectPicture(clicked);
+                } else {
+                    selectPicture(clicked);
+                }
+                dragStart = { x: mouseX, y: mouseY }; 
+            } else {
+                isPanning = true;
+                panStart = { x: mouseX, y: mouseY }; 
+                selectedPic = null;
+                updateEditPanel();
+            }
+            return;
+        }
+
+        if(clicked) {
+            selectPicture(clicked);
+            if(!clicked.locked) {
+                isDragging = true;
+                dragStart = m; 
+                initialPositions.clear();
+                pictures.forEach(p => initialPositions.set(p.id, { x: p.x, y: p.y }));
+                container.style.cursor = 'grabbing';
+            }
+        } else {
+            isPanning = true;
+            panStart = { x: mouseX, y: mouseY }; 
+            selectedPic = null;
+            updateEditPanel();
+            container.style.cursor = 'grabbing';
+        }
+    }
+
+    function onMouseMove(e) {
+        const rect = canvas.getBoundingClientRect();
+        const mouseX = e.clientX - rect.left;
+        const mouseY = e.clientY - rect.top;
+
+        if (isPanning) {
+            app.panX += (mouseX - panStart.x);
+            app.panY += (mouseY - panStart.y);
+            panStart = { x: mouseX, y: mouseY };
+            return;
+        }
+
+        if (isImgEditMode && isDraggingImg) {
+            const dx = (mouseX - dragStart.x) / app.scale; 
+            const dy = (mouseY - dragStart.y) / app.scale;
+            
+            if (isGlobalMaskMode && globalImgData) {
+                globalImgData.offsetX += dx;
+                globalImgData.offsetY += dy;
+            } else if (selectedPic && selectedPic.imgData) {
+                selectedPic.imgData.offsetX += dx;
+                selectedPic.imgData.offsetY += dy;
+            }
+            
+            dragStart = { x: mouseX, y: mouseY };
+            return;
+        }
+
+        if (isDragging && selectedPic && !isImgEditMode) {
+            const m = toWorld(mouseX, mouseY);
+            const dx = m.x - dragStart.x;
+            const dy = m.y - dragStart.y;
+
+            if (moveAllGroup) {
+                pictures.forEach(p => {
+                    const init = initialPositions.get(p.id);
+                    if(init) { p.x = init.x + dx; p.y = init.y + dy; }
+                });
+                activeGuides = [];
+            } else {
+                const init = initialPositions.get(selectedPic.id);
+                if(!init) return;
+                let newX = init.x + dx;
+                let newY = init.y + dy;
+                
+                activeGuides = [];
+                if(enableSmartGuides) {
+                    const threshold = 10 / app.scale; 
+                    const edgesX = [newX, newX + selectedPic.w/2, newX + selectedPic.w];
+                    const edgesY = [newY, newY + selectedPic.h/2, newY + selectedPic.h];
+                    const targetsX = [{val: app.w/2, type:'center'}];
+                    const targetsY = [{val: app.h/2, type:'center'}];
+                    
+                    pictures.forEach(p => {
+                        if(p === selectedPic) return;
+                        targetsX.push({val: p.x, type:'edge'}, {val: p.x+p.w/2, type:'center'}, {val: p.x+p.w, type:'edge'});
+                        targetsY.push({val: p.y, type:'edge'}, {val: p.y+p.h/2, type:'center'}, {val: p.y+p.h, type:'edge'});
+                    });
+
+                    for(let edge of edgesX) {
+                        let snapped = false;
+                        for(let t of targetsX) {
+                            if(Math.abs(edge - t.val) < threshold) {
+                                newX += t.val - edge;
+                                activeGuides.push({type:'v', x: t.val});
+                                snapped = true; break;
+                            }
+                        }
+                        if(snapped) break;
+                    }
+
+                    for(let edge of edgesY) {
+                        let snapped = false;
+                        for(let t of targetsY) {
+                            if(Math.abs(edge - t.val) < threshold) {
+                                newY += t.val - edge;
+                                activeGuides.push({type:'h', y: t.val});
+                                snapped = true; break;
+                            }
+                        }
+                        if(snapped) break;
+                    }
+                }
+                selectedPic.x = newX;
+                selectedPic.y = newY;
+            }
+            return;
+        }
+
+        if (!isImgEditMode) {
+            const m = toWorld(mouseX, mouseY);
+            let hover = false;
+            const hitList = pictures.map((p, i) => ({p, i})).sort((a, b) => {
+                const zDiff = (b.p.z || 0) - (a.p.z || 0);
+                return zDiff !== 0 ? zDiff : b.i - a.i;
+            }).map(x => x.p);
+
+            for(let p of hitList) {
+                if(m.x >= p.x && m.x <= p.x + p.w && m.y >= p.y && m.y <= p.y + p.h) {
+                    hover = true; break;
+                }
+            }
+            container.style.cursor = hover ? 'grab' : 'default'; 
+        }
+    }
+
+    function onMouseUp() {
+        if(isDragging) { isDragging = false; activeGuides = []; saveState(); }
+        if(isPanning) { isPanning = false; }
+        if(isDraggingImg) { isDraggingImg = false; saveState(); }
+        
+        if(!isImgEditMode) container.style.cursor = 'grab';
+    }
+
+    /* =========================================
+       DRAWING FUNCTIONS
+       ========================================= */
+    function drawImages(targetCtx, wallX, wallY, currentScale, renderList) {
+        if (!renderList || renderList.length === 0) return;
+
+        if (isGlobalMaskMode && globalImgData) {
+            const img = ensureImageLoaded(globalImgData.base64);
+            if (img && img.complete) {
+                targetCtx.save();
+                targetCtx.beginPath();
+                renderList.forEach(p => {
+                    targetCtx.rect(wallX + p.x * currentScale, wallY + p.y * currentScale, p.w * currentScale, p.h * currentScale);
+                });
+                targetCtx.clip();
+
+                const bounds = getSetBounds();
+                const setW = (bounds.maxX - bounds.minX) * currentScale;
+                const setH = (bounds.maxY - bounds.minY) * currentScale;
+                const setCX = wallX + (bounds.minX * currentScale) + setW/2;
+                const setCY = wallY + (bounds.minY * currentScale) + setH/2;
+
+                const imgW = img.width * globalImgData.scale * currentScale;
+                const imgH = img.height * globalImgData.scale * currentScale;
+                const drawX = setCX - imgW/2 + (globalImgData.offsetX * currentScale);
+                const drawY = setCY - imgH/2 + (globalImgData.offsetY * currentScale);
+
+                targetCtx.drawImage(img, drawX, drawY, imgW, imgH);
+                targetCtx.restore();
+            }
+        } else if (!isGlobalMaskMode) {
+            renderList.forEach(p => {
+                if (p.imgData) {
+                    const img = ensureImageLoaded(p.imgData.base64);
+                    if (img && img.complete) {
+                        const px = wallX + p.x * currentScale;
+                        const py = wallY + p.y * currentScale;
+                        const pw = p.w * currentScale;
+                        const ph = p.h * currentScale;
+
+                        targetCtx.save();
+                        targetCtx.beginPath();
+                        targetCtx.rect(px, py, pw, ph);
+                        targetCtx.clip();
+
+                        const imgW = img.width * p.imgData.scale * currentScale;
+                        const imgH = img.height * p.imgData.scale * currentScale;
+                        const drawX = px + pw/2 - imgW/2 + (p.imgData.offsetX * currentScale);
+                        const drawY = py + ph/2 - imgH/2 + (p.imgData.offsetY * currentScale);
+
+                        targetCtx.drawImage(img, drawX, drawY, imgW, imgH);
+                        targetCtx.restore();
+                    }
+                }
+            });
+        }
+    }
+
+    function drawPictureOverlay(p, idx, targetCtx, wallX, wallY, currentScale) {
+        const px = wallX + p.x * currentScale;
+        const py = wallY + p.y * currentScale;
+        const pw = p.w * currentScale;
+        const ph = p.h * currentScale;
+
+        if(p === selectedPic) {
+            targetCtx.strokeStyle = isImgEditMode ? '#f59e0b' : '#38bdf8'; 
+            targetCtx.lineWidth = 3;
+            targetCtx.strokeRect(px, py, pw, ph);
+        }
+
+        if(showDimensions) {
+            const hasImg = isGlobalMaskMode && globalImgData || !isGlobalMaskMode && p.imgData;
+            targetCtx.fillStyle = hasImg ? 'rgba(255,255,255,0.8)' : '#000000'; 
+            
+            // Xoá shadow
+            targetCtx.shadowColor = 'transparent'; targetCtx.shadowBlur = 0;
+
+            const fontSize = Math.max(12, 5 * currentScale);
+            targetCtx.font = `bold ${fontSize}px sans-serif`;
+            targetCtx.textAlign = 'center'; targetCtx.textBaseline = 'middle';
+            
+            targetCtx.fillText(String(idx + 1).padStart(2, '0'), px + pw/2, py + ph/2 - fontSize/1.2);
+            targetCtx.font = `${fontSize * 0.8}px sans-serif`;
+            targetCtx.fillText(`${Math.round(p.w)}x${Math.round(p.h)}cm`, px + pw/2, py + ph/2 + fontSize/1.2);
+        }
+    }
+
+    function drawLoop() {
+        ctx.clearRect(0, 0, container.clientWidth, container.clientHeight);
+        drawGrid();
+
+        const wallX = app.panX;
+        const wallY = app.panY;
+        const wallW = app.w * app.scale;
+        const wallH = app.h * app.scale;
+
+        ctx.shadowColor = 'rgba(0,0,0,0.2)';
+        ctx.shadowBlur = 20;
+        ctx.shadowOffsetX = 0;
+        ctx.shadowOffsetY = 10;
+        ctx.fillStyle = '#e2e8f0'; 
+        ctx.fillRect(wallX, wallY, wallW, wallH);
+        
+        ctx.shadowColor = 'transparent'; 
+        ctx.strokeStyle = '#cbd5e1'; ctx.lineWidth = 2;
+        ctx.strokeRect(wallX, wallY, wallW, wallH);
+
+        if (furniture.visible) {
+            const fW = furniture.w * app.scale, fH = furniture.h * app.scale;
+            const fX = wallX + (wallW - fW) / 2, fY = wallY + wallH - fH;
+            ctx.fillStyle = '#8b8e95'; ctx.fillRect(fX, fY, fW, fH);
+            ctx.fillStyle = '#000000'; 
+            ctx.font = `bold ${Math.max(12, 5 * app.scale)}px sans-serif`;
+            ctx.textAlign = 'center'; ctx.textBaseline = 'bottom';
+            ctx.fillText(`Vật thể: ${furniture.w} x ${furniture.h}cm`, fX + fW/2, fY - (1 * app.scale));
+        }
+
+        const renderList = pictures.map((p, i) => ({p, i})).sort((a, b) => {
+            const zDiff = (a.p.z || 0) - (b.p.z || 0);
+            return zDiff !== 0 ? zDiff : a.i - b.i;
+        }).map(x => x.p);
+
+        renderList.forEach((p) => {
+            ctx.fillStyle = '#c4ced0'; 
+            ctx.fillRect(wallX + p.x * app.scale, wallY + p.y * app.scale, p.w * app.scale, p.h * app.scale);
+        });
+
+        drawImages(ctx, wallX, wallY, app.scale, renderList);
+
+        renderList.forEach((p) => {
+            const originalIndex = pictures.indexOf(p); 
+            if (p !== selectedPic) drawPictureOverlay(p, originalIndex, ctx, wallX, wallY, app.scale);
+        });
+        if (selectedPic) {
+            drawPictureOverlay(selectedPic, pictures.indexOf(selectedPic), ctx, wallX, wallY, app.scale);
+        }
+
+        ctx.beginPath();
+        activeGuides.forEach(g => {
+            if(g.type === 'v') {
+                const gx = wallX + g.x * app.scale;
+                ctx.moveTo(gx, 0); ctx.lineTo(gx, container.clientHeight);
+            } else {
+                const gy = wallY + g.y * app.scale;
+                ctx.moveTo(0, gy); ctx.lineTo(container.clientWidth, gy);
+            }
+        });
+        ctx.strokeStyle = '#ec4899'; ctx.lineWidth = 1; ctx.setLineDash([4, 4]); ctx.stroke(); ctx.setLineDash([]);
+        
+        drawWallInfoBox(ctx, wallX, wallY, wallW, wallH, app.scale);
+
+        requestAnimationFrame(drawLoop);
+    }
+
+    function calculateGapInfo() {
+        if (pictures.length < 2) return "--";
+        let gaps = [];
+        const sorted = [...pictures].sort((a,b) => a.x - b.x);
+        for(let i=0; i<sorted.length; i++) {
+            const p1 = sorted[i]; let minGap = Infinity; let found = false;
+            for(let j=0; j<sorted.length; j++) {
+                if(i === j) continue;
+                const p2 = sorted[j];
+                if (p2.x > p1.x) {
+                    const top = Math.max(p1.y, p2.y); const bottom = Math.min(p1.y + p1.h, p2.y + p2.h);
+                    if (bottom > top) { 
+                        const gap = p2.x - (p1.x + p1.w);
+                        if (gap >= -0.5) { if (gap < minGap) { minGap = gap; found = true; } }
+                    }
+                }
+            }
+            if(found && minGap < app.w) gaps.push(minGap);
+        }
+        if (gaps.length === 0) return "--";
+        const avg = gaps.reduce((a,b)=>a+b,0)/gaps.length;
+        const min = Math.min(...gaps); const max = Math.max(...gaps);
+        if (max - min < 1) return Math.round(avg) + " cm";
+        return `${Math.round(min)} - ${Math.round(max)} cm`;
+    }
+
+    function drawWallInfoBox(targetCtx, wX, wY, wW, wH, currentScale) {
+        if (!showWallInfo || pictures.length === 0) return;
+        const bounds = getSetBounds();
+        const setW = Math.round(bounds.maxX - bounds.minX);
+        const setH = Math.round(bounds.maxY - bounds.minY);
+
+        let sizeMap = {};
+        pictures.forEach(p => {
+            let key = `${Math.round(p.w)}x${Math.round(p.h)}`;
+            sizeMap[key] = (sizeMap[key] || 0) + 1;
+        });
+        let sizeStrings = [];
+        for (let key in sizeMap) sizeStrings.push(`${sizeMap[key]} bức ${key}cm`);
+        
+        let furnDistText = "--";
+        if (furniture.visible) {
+            furnDistText = `${Math.round((app.h - furniture.h) - bounds.maxY)} cm`;
+        }
+
+        const lines = [
+            { text: `THÔNG SỐ LAYOUT`, bold: true },
+            { text: `• Kích thước tường: ${app.w} x ${app.h} cm` },
+            { text: `• Kích thước set: ${setW} x ${setH} cm` },
+            { text: `• Số lượng: ${pictures.length} bức` },
+            { text: `• Chi tiết: ${sizeStrings.join(", ")}` },
+            { text: `• Khoảng cách ngang: ${calculateGapInfo()}` },
+            { text: `• Cách vật thể: ${furnDistText}` }
+        ];
+
+        const fontSizePx = Math.max(12, 5 * currentScale); 
+        const padding = fontSizePx * 0.8;
+        const lineHeight = fontSizePx * 1.5;
+        
+        targetCtx.font = `${fontSizePx}px sans-serif`;
+        let maxW = 0;
+        lines.forEach(l => {
+            targetCtx.font = (l.bold ? `bold ` : `normal `) + `${fontSizePx}px sans-serif`;
+            const lw = targetCtx.measureText(l.text).width;
+            if (lw > maxW) maxW = lw;
+        });
+
+        const boxW = maxW + padding * 2;
+        const boxH = lines.length * lineHeight + padding * 1.5;
+        const margin = 2 * currentScale;
+        
+        const boxX = wX + margin;
+        const boxY = wY + wH - boxH - margin;
+
+        targetCtx.fillStyle = 'rgba(15, 23, 42, 0.85)';
+        targetCtx.beginPath();
+        if (targetCtx.roundRect) targetCtx.roundRect(boxX, boxY, boxW, boxH, Math.max(4, 2 * currentScale));
+        else targetCtx.rect(boxX, boxY, boxW, boxH);
+        targetCtx.fill();
+
+        targetCtx.fillStyle = '#f1f5f9';
+        targetCtx.textBaseline = 'top'; targetCtx.textAlign = 'left';
+        
+        let currentY = boxY + padding;
+        lines.forEach((l, i) => {
+            targetCtx.font = (l.bold ? `bold ` : `normal `) + `${fontSizePx}px sans-serif`;
+            targetCtx.fillText(l.text, boxX + padding, currentY);
+            currentY += lineHeight;
+            if(i === 0) currentY += padding/2; 
+        });
+    }
+
+    /* =========================================
+       HELPER LOGIC
+       ========================================= */
+    function drawGrid() {
+        const spacing = 50 * app.scale; 
+        const offsetX = app.panX % spacing, offsetY = app.panY % spacing;
+        ctx.beginPath();
+        for (let x = offsetX; x < container.clientWidth; x += spacing) { ctx.moveTo(x, 0); ctx.lineTo(x, container.clientHeight); }
+        for (let y = offsetY; y < container.clientHeight; y += spacing) { ctx.moveTo(0, y); ctx.lineTo(container.clientWidth, y); }
+        ctx.strokeStyle = 'rgba(255, 255, 255, 0.05)'; ctx.lineWidth = 1; ctx.stroke();
+    }
+
+    function createPics(num, w, h, gap) {
+        const cols = Math.floor((app.w - gap) / (w + gap)) || 1;
+        const startX = (app.w - (Math.min(num, cols)*w + (Math.min(num, cols)-1)*gap))/2;
+        const rows = Math.ceil(num/cols);
+        const startY = (app.h - (rows*h + (rows-1)*gap))/2;
+
+        pictures = [];
+        for(let i=0; i<num; i++) {
+            pictures.push({
+                id: Date.now()+i, z: i, x: startX + (i%cols)*(w+gap), y: startY + Math.floor(i/cols)*(h+gap),
+                w: w, h: h, locked: false, imgData: null
+            });
+        }
+        updateEditPanel();
+    }
+
+    function moveSelection(dx, dy) {
+        if (!selectedPic || selectedPic.locked) return;
+        let step = parseFloat(document.getElementById('moveStep').value);
+        if (isNaN(step) || step <= 0) step = 1; 
+        
+        selectedPic.x += dx * step; selectedPic.y += dy * step;
+        if(moveAllGroup) pictures.forEach(p => { if(p!==selectedPic) { p.x += dx*step; p.y += dy*step; }});
+        saveState();
+    }
+
+    function updateSelectedSize() {
+        if(selectedPic) {
+            let w = parseInt(document.getElementById('picW').value);
+            let h = parseInt(document.getElementById('picH').value);
+            if (isNaN(w) || w <= 0) w = selectedPic.w;
+            if (isNaN(h) || h <= 0) h = selectedPic.h;
+            
+            selectedPic.w = w; selectedPic.h = h;
+            document.getElementById('picW').value = w; document.getElementById('picH').value = h;
+            saveState();
+        }
+    }
+
+    function cloneSelectedPic() {
+        if(!selectedPic) return;
+        let safeMaxX = Math.max(0, app.w - selectedPic.w);
+        let safeMaxY = Math.max(0, app.h - selectedPic.h);
+        let newX = Math.max(0, Math.min(safeMaxX, selectedPic.x + 10));
+        let newY = Math.max(0, Math.min(safeMaxY, selectedPic.y + 10));
+        
+        let maxZ = pictures.reduce((max, p) => Math.max(max, p.z || 0), 0);
+        const clone = { ...selectedPic, id: Date.now(), z: maxZ + 1, x: newX, y: newY, imgData: null };
+        pictures.push(clone); selectPicture(clone); saveState();
+    }
+
+    function selectPicture(pic) {
+        selectedPic = pic;
+        let zChanged = false;
+        if (pic) {
+            let maxZ = pictures.reduce((max, p) => Math.max(max, p.z || 0), 0);
+            if ((pic.z || 0) < maxZ) { pic.z = maxZ + 1; zChanged = true; }
+        }
+        updateEditPanel();
+        if (zChanged) saveState();
+    }
+    
+    function centerViewOnPic(pic) {
+        const picCX = pic.x + (pic.w / 2);
+        const picCY = pic.y + (pic.h / 2);
+        app.panX = (container.clientWidth / 2) - (picCX * app.scale);
+        app.panY = (container.clientHeight / 2) - (picCY * app.scale);
+    }
+
+    function updateEditPanel() {
+        const panel = document.getElementById('editPanel');
+        const imgScaleGroup = document.getElementById('imgScaleGroup');
+        const selectIndexInput = document.getElementById('selectPicIndex');
+        const slider = document.getElementById('imgScaleSlider');
+        const scaleVal = document.getElementById('imgScaleVal');
+
+        if(selectedPic) {
+            panel.style.opacity = '1'; panel.style.pointerEvents = 'auto';
+            document.getElementById('picW').value = Math.round(selectedPic.w);
+            document.getElementById('picH').value = Math.round(selectedPic.h);
+            selectIndexInput.value = pictures.indexOf(selectedPic) + 1;
+        } else {
+            panel.style.opacity = '0.5'; panel.style.pointerEvents = 'none';
+            selectIndexInput.value = '';
+            document.getElementById('picW').value = ''; document.getElementById('picH').value = '';
+        }
+
+        document.getElementById('globalImgToggle').checked = isGlobalMaskMode;
+        document.getElementById('editImgBtn').classList.toggle('btn-primary', isImgEditMode);
+        document.getElementById('editImgBtn').classList.toggle('btn-secondary', !isImgEditMode);
+        container.classList.toggle('img-edit-mode', isImgEditMode);
+
+        if (isImgEditMode && (isGlobalMaskMode || (selectedPic && selectedPic.imgData))) {
+            imgScaleGroup.style.opacity = '1'; imgScaleGroup.style.pointerEvents = 'auto';
+            let data = isGlobalMaskMode ? globalImgData : selectedPic.imgData;
+            if(data) {
+                let ratio = data.scale / data.baseScale;
+                slider.value = ratio; scaleVal.innerText = Math.round(ratio * 100) + '%';
+            }
+        } else {
+            imgScaleGroup.style.opacity = '0.5'; imgScaleGroup.style.pointerEvents = 'none';
+        }
+    }
+
+    function centerAllContent() {
+        if(!pictures.length) return;
+        let bounds = getSetBounds();
+        const shiftX = (app.w - (bounds.maxX-bounds.minX))/2 - bounds.minX;
+        const shiftY = (app.h - (bounds.maxY-bounds.minY))/2 - bounds.minY;
+        pictures.forEach(p=>{ p.x+=shiftX; p.y+=shiftY; });
+        saveState();
+    }
+
+    function alignArtToFurniture() {
+        if(!pictures.length) return;
+        let lowestY = -Infinity;
+        pictures.forEach(p => { if ((p.y + p.h) > lowestY) lowestY = p.y + p.h; });
+        const furnTopY = app.h - furniture.h;
+        const shiftY = (furnTopY - furniture.distance) - lowestY;
+        pictures.forEach(p => p.y += shiftY);
+        saveState();
+    }
+
+    function onKeyDown(e) {
+        // Fix 1: Chặn phím tắt Canvas nếu người dùng đang nhập liệu trong ô Input
+        if (document.activeElement.tagName === 'INPUT') return;
+
+        if((e.ctrlKey||e.metaKey)) { 
+            if(e.key==='z') {e.preventDefault();undo();} 
+            if(e.key==='y'){e.preventDefault();redo();} 
+            if(e.key==='0'){e.preventDefault();fitWallToScreen();}
+            if((e.key==='c' || e.key==='C') && selectedPic) {
+                e.preventDefault(); cloneSelectedPic();
+            }
+        }
+        
+        if (e.key === 'Delete' || e.key === 'Backspace') {
+            if (isImgEditMode) {
+                e.preventDefault();
+                if (isGlobalMaskMode) globalImgData = null;
+                else if (selectedPic) selectedPic.imgData = null;
+                updateEditPanel(); saveState();
+            } else if (selectedPic && !selectedPic.locked) {
+                e.preventDefault();
+                pictures = pictures.filter(p => p !== selectedPic);
+                selectedPic = null;
+                if(pictures.length === 0) isGlobalMaskMode = false;
+                updateEditPanel(); saveState();
+            }
+        }
+
+        if(selectedPic && !selectedPic.locked && !isImgEditMode) {
+            if(e.key==='ArrowUp'){e.preventDefault();moveSelection(0,-1);}
+            if(e.key==='ArrowDown'){e.preventDefault();moveSelection(0,1);}
+            if(e.key==='ArrowLeft'){e.preventDefault();moveSelection(-1,0);}
+            if(e.key==='ArrowRight'){e.preventDefault();moveSelection(1,0);}
+        }
+    }
+
+    /* =========================================
+       STATE & EXPORT
+       ========================================= */
+    function saveState() {
+        const state = JSON.stringify({ pictures, furniture, w: app.w, h: app.h, isGlobalMaskMode, globalImgData });
+        if(history.current < history.stack.length-1) history.stack = history.stack.slice(0, history.current+1);
+        history.stack.push(state);
+        if(history.stack.length>history.max) history.stack.shift(); else history.current++;
+        updateUndoBtns();
+    }
+    function undo() { if(history.current>0) restoreState(history.stack[--history.current]); updateUndoBtns(); }
+    function redo() { if(history.current<history.stack.length-1) restoreState(history.stack[++history.current]); updateUndoBtns(); }
+    function restoreState(json) {
+        const s = JSON.parse(json);
+        app.w=s.w; app.h=s.h; pictures=s.pictures; furniture=s.furniture; 
+        isGlobalMaskMode = s.isGlobalMaskMode || false; globalImgData = s.globalImgData || null;
+        
+        document.getElementById('wallWidth').value=app.w; document.getElementById('wallHeight').value=app.h;
+        document.getElementById('furnW').value=furniture.w; document.getElementById('furnH').value=furniture.h;
+        document.getElementById('furnDist').value=furniture.distance; document.getElementById('showFurniture').checked=furniture.visible;
+        
+        selectedPic=null; updateEditPanel();
+    }
+    function updateUndoBtns() { 
+        document.getElementById('undoBtn').disabled = history.current <= 0; 
+        document.getElementById('redoBtn').disabled = history.current >= history.stack.length - 1; 
+    }
+
+    function downloadImage(type) {
+        const tCanvas = document.createElement('canvas');
+        const tCtx = tCanvas.getContext('2d');
+        const outputScale = 15; 
+        tCanvas.width = app.w * outputScale;
+        tCanvas.height = app.h * outputScale;
+        
+        const scale = outputScale;
+
+        // VẼ NỀN TƯỜNG (Áp dụng cho CẢ JPEG VÀ PNG)
+        tCtx.fillStyle = '#e2e8f0'; 
+        tCtx.fillRect(0,0,tCanvas.width, tCanvas.height);
+        tCtx.strokeStyle = '#cbd5e1'; 
+        tCtx.lineWidth = scale * 0.2; 
+        tCtx.strokeRect(0,0,tCanvas.width, tCanvas.height);
+
+        if(furniture.visible) {
+            const fW = furniture.w*scale, fH = furniture.h*scale;
+            tCtx.fillStyle='#8b8e95'; 
+            tCtx.fillRect((tCanvas.width-fW)/2, tCanvas.height-fH, fW, fH);
+            tCtx.fillStyle = '#000000'; 
+            tCtx.font = `bold ${5 * scale}px sans-serif`; 
+            tCtx.textAlign = 'center'; tCtx.textBaseline = 'bottom';
+            tCtx.fillText(`Vật thể: ${furniture.w} x ${furniture.h}cm`, (tCanvas.width)/2, tCanvas.height - fH - (1 * scale));
+        }
+
+        const renderList = pictures.map((p, i) => ({p, i})).sort((a, b) => {
+            const zDiff = (a.p.z || 0) - (b.p.z || 0);
+            return zDiff !== 0 ? zDiff : a.i - b.i;
+        }).map(x => x.p);
+
+        if (type === 'jpeg') {
+            // JPEG: Vẽ mảng màu xám làm nền tranh
+            renderList.forEach(p => {
+                tCtx.fillStyle='#c4ced0'; 
+                tCtx.fillRect(p.x*scale, p.y*scale, p.w*scale, p.h*scale);
+            });
+        } else if (type === 'png') {
+            // PNG: Đục rỗng (xóa) vị trí các bức tranh để tạo lỗ trong suốt trên tường
+            renderList.forEach(p => {
+                tCtx.clearRect(p.x*scale, p.y*scale, p.w*scale, p.h*scale);
+            });
+        }
+
+        // Vẽ ảnh chèn vào (nếu có tải ảnh lên)
+        drawImages(tCtx, 0, 0, scale, renderList);
+        
+        // Vẽ Text sau cùng để đảm bảo luôn hiển thị thông số đúng
+        renderList.forEach((p) => {
+            const idx = pictures.indexOf(p);
+            const x=p.x*scale, y=p.y*scale, w=p.w*scale, h=p.h*scale;
+            const hasImg = isGlobalMaskMode && globalImgData || !isGlobalMaskMode && p.imgData;
+            
+            if(showDimensions) {
+                tCtx.fillStyle = hasImg ? 'rgba(255,255,255,0.8)' : '#000000'; 
+                tCtx.shadowColor = 'transparent'; tCtx.shadowBlur = 0; 
+                tCtx.font=`bold ${5 * scale}px sans-serif`; 
+                tCtx.textAlign='center'; tCtx.textBaseline='middle'; 
+                
+                const textIndex = String(idx + 1).padStart(2, '0');
+                tCtx.fillText(textIndex, x+w/2, y+h/2 - (5*scale)/1.2);
+                
+                tCtx.font=`${(5*scale)*0.8}px sans-serif`;
+                tCtx.fillText(`${Math.round(p.w)}x${Math.round(p.h)}cm`, x+w/2, y+h/2 + (5*scale)/1.2);
+            }
+        });
+
+        // Vẽ bản thông số
+        drawWallInfoBox(tCtx, 0, 0, tCanvas.width, tCanvas.height, outputScale);
+
+        const link = document.createElement('a');
+        link.download = `layout-${app.w}x${app.h}.${type}`;
+        link.href = tCanvas.toDataURL(`image/${type}`);
+        link.click();
+    }
+
+    init();
+  </script>
+</body>
+</html>
