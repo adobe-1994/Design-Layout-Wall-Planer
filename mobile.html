@@ -54,10 +54,11 @@
     /* Floating Tools (Nút nổi góc phải) */
     .floating-tools {
       position: absolute;
-      top: 15px;
-      right: 15px;
+      bottom: 15px;
+      left: 50%;
+      transform: translateX(-50%);
       display: flex;
-      flex-direction: column;
+      flex-direction: row;
       gap: 10px;
       z-index: 10;
     }
@@ -82,7 +83,7 @@
 
     #zoom-indicator {
       position: absolute;
-      bottom: 15px; left: 15px;
+      top: 15px; left: 15px;
       background: rgba(0,0,0,0.6);
       color: white;
       padding: 5px 10px; border-radius: 6px;
@@ -254,11 +255,11 @@
     
     <!-- Floating Tools chuẩn Mobile -->
     <div class="floating-tools">
-      <button class="tool-btn" id="floatDeleteBtn" disabled title="Xóa"><i class="fas fa-trash-alt"></i></button>
-      <button class="tool-btn" id="floatCloneBtn" disabled title="Nhân bản (Copy)"><i class="fas fa-copy"></i></button>
-      <button class="tool-btn" id="resetViewBtnMobile" title="Phóng vừa màn hình"><i class="fas fa-expand"></i></button>
-      <button class="tool-btn" id="undoBtn" disabled title="Hoàn tác"><i class="fas fa-undo"></i></button>
       <button class="tool-btn" id="redoBtn" disabled title="Làm lại"><i class="fas fa-redo"></i></button>
+      <button class="tool-btn" id="undoBtn" disabled title="Hoàn tác"><i class="fas fa-undo"></i></button>
+      <button class="tool-btn" id="resetViewBtnMobile" title="Phóng vừa màn hình"><i class="fas fa-expand"></i></button>
+      <button class="tool-btn" id="floatCloneBtn" disabled title="Nhân bản (Copy)"><i class="fas fa-copy"></i></button>
+      <button class="tool-btn" id="floatDeleteBtn" disabled title="Xóa"><i class="fas fa-trash-alt"></i></button>
     </div>
   </div>
 
@@ -834,7 +835,8 @@
             const originalBase64 = event.target.result;
             const img = new Image();
             img.onload = function() {
-                const MAX_SIZE = 1920; 
+                // --- Thay đổi: Ép kích thước ảnh nhỏ lại để nhẹ máy ---
+                const MAX_SIZE = 1080; // Hạ từ 1920 xuống 1080 (Vừa đủ nét)
                 let targetW = img.width, targetH = img.height;
                 if (targetW > MAX_SIZE || targetH > MAX_SIZE) {
                     const ratio = Math.min(MAX_SIZE / targetW, MAX_SIZE / targetH);
@@ -845,7 +847,11 @@
                 const tCtx = tempCanvas.getContext('2d');
                 tCtx.drawImage(img, 0, 0, targetW, targetH);
                 const isPng = file.type === 'image/png';
-                const optimizedBase64 = tempCanvas.toDataURL(isPng ? 'image/png' : 'image/jpeg', isPng ? undefined : 0.8);
+                
+                // Nén chất lượng ảnh JPEG xuống 75% (0.75) thay vì 80% (0.8)
+                const optimizedBase64 = tempCanvas.toDataURL(isPng ? 'image/png' : 'image/jpeg', isPng ? undefined : 0.75);
+                // ------------------------------------------------------
+                
                 const finalImg = new Image();
                 finalImg.onload = function() {
                     imgCache.set(optimizedBase64, finalImg);
