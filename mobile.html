@@ -218,23 +218,21 @@
     .toggle-switch input:checked + .toggle-slider { background: var(--color-primary); border-color: var(--color-primary); }
     .toggle-switch input:checked + .toggle-slider::before { transform: translateX(20px); background: #0f172a; }
 
-    /* Dpad Controls cho di chuyển thủ công */
+    /* Dpad Controls (Mới: Dàn hàng ngang) */
     .dpad-container {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
+      display: flex;
+      flex-direction: row;
       gap: 8px;
-      width: 150px;
-      margin: 15px auto;
+      width: 100%;
+      margin: 15px 0;
     }
     .dpad-btn {
+      flex: 1;
       background: var(--color-bg-surface); border: none; border-radius: 8px;
       color: white; height: 45px; display: flex; align-items: center; justify-content: center;
+      font-size: 18px;
     }
     .dpad-btn:active { background: var(--color-primary); color: #000; }
-    .dpad-up { grid-column: 2; grid-row: 1; }
-    .dpad-left { grid-column: 1; grid-row: 2; }
-    .dpad-right { grid-column: 3; grid-row: 2; }
-    .dpad-down { grid-column: 2; grid-row: 3; }
 
     /* Range Slider */
     input[type=range] { -webkit-appearance: none; width: 100%; background: transparent; }
@@ -256,22 +254,21 @@
     
     <!-- Floating Tools chuẩn Mobile -->
     <div class="floating-tools">
+      <button class="tool-btn" id="floatDeleteBtn" disabled title="Xóa"><i class="fas fa-trash-alt"></i></button>
+      <button class="tool-btn" id="floatCloneBtn" disabled title="Nhân bản (Copy)"><i class="fas fa-copy"></i></button>
+      <button class="tool-btn" id="resetViewBtnMobile" title="Phóng vừa màn hình"><i class="fas fa-expand"></i></button>
       <button class="tool-btn" id="undoBtn" disabled title="Hoàn tác"><i class="fas fa-undo"></i></button>
       <button class="tool-btn" id="redoBtn" disabled title="Làm lại"><i class="fas fa-redo"></i></button>
-      <button class="tool-btn" id="resetViewBtnMobile" title="Phóng vừa màn hình"><i class="fas fa-expand"></i></button>
     </div>
   </div>
 
   <!-- Nửa dưới: Điều khiển -->
   <div class="controls-area">
     
-    <!-- Tabs Navigation -->
+    <!-- Tabs Navigation (Đã xóa Tab Tạo Bộ) -->
     <div class="tabs-nav">
       <button class="tab-btn active" data-target="tab-tuong">
         <i class="fas fa-border-all"></i><span>Tường</span>
-      </button>
-      <button class="tab-btn" data-target="tab-taobo">
-        <i class="fas fa-layer-group"></i><span>Tạo Bộ</span>
       </button>
       <button class="tab-btn" data-target="tab-tinhchinh">
         <i class="fas fa-sliders-h"></i><span>Tinh chỉnh</span>
@@ -330,39 +327,10 @@
         </div>
       </div>
 
-      <!-- TAB 2: TẠO BỘ -->
-      <div id="tab-taobo" class="tab-content">
-        <div class="panel-card">
-          <h2 class="section-title">Thiết lập bộ tranh</h2>
-          <div class="form-group">
-            <label class="form-label">Số lượng tranh</label>
-            <input type="number" class="form-control" id="picCount" value="3" min="1">
-          </div>
-          <div class="input-group">
-            <div class="form-group">
-              <label class="form-label">Rộng 1 tranh</label>
-              <input type="number" class="form-control" id="commonW" value="50">
-            </div>
-            <div class="form-group">
-              <label class="form-label">Cao 1 tranh</label>
-              <input type="number" class="form-control" id="commonH" value="70">
-            </div>
-          </div>
-          <div class="form-group">
-            <label class="form-label">Khoảng cách giữa các tranh (cm)</label>
-            <input type="number" class="form-control" id="picGap" value="10">
-          </div>
-          <div class="btn-group" style="margin-top: 16px;">
-            <button class="btn btn-primary" id="createBtn">Tạo mới</button>
-            <button class="btn btn-danger" id="resetBtn">Xóa hết</button>
-          </div>
-        </div>
-      </div>
-
-      <!-- TAB 3: TINH CHỈNH -->
+      <!-- TAB 2: TINH CHỈNH -->
       <div id="tab-tinhchinh" class="tab-content">
         
-        <!-- Quản lý hình ảnh (Đưa lên trên để dễ dùng) -->
+        <!-- Quản lý hình ảnh -->
         <div class="panel-card">
           <h2 class="section-title"><i class="fas fa-image"></i> Hình ảnh hiển thị</h2>
           <input type="file" id="imageUpload" accept="image/*" style="display: none;">
@@ -386,9 +354,8 @@
               <span id="imgScaleVal" style="font-size: 12px;">100%</span>
             </div>
             <input type="range" id="imgScaleSlider" min="0.1" max="5" step="0.05" value="1">
-            <div class="btn-group" style="margin-top: 16px;">
-              <button class="btn btn-secondary" id="resetImgBtn">Reset vị trí</button>
-              <button class="btn btn-danger" id="deleteImgBtn">Xóa ảnh</button>
+            <div style="margin-top: 16px;">
+              <button class="btn btn-secondary" id="resetImgBtn" style="width: 100%">Reset vị trí ảnh</button>
             </div>
           </div>
         </div>
@@ -397,46 +364,41 @@
         <div class="panel-card" id="editPanel">
           <h2 class="section-title">Chi tiết khung tranh</h2>
           
-          <div class="form-group">
-            <label class="form-label" style="color: var(--color-primary);">Chọn STT tranh để sửa:</label>
-            <input type="number" class="form-control" id="selectPicIndex" min="1" placeholder="Nhập số..." style="text-align: center; font-weight: bold;">
-          </div>
-
           <div class="input-group">
             <div class="form-group">
-              <label class="form-label">Ngang</label>
+              <label class="form-label">Ngang (cm)</label>
               <input type="number" class="form-control" id="picW">
             </div>
             <div class="form-group">
-              <label class="form-label">Cao</label>
+              <label class="form-label">Cao (cm)</label>
               <input type="number" class="form-control" id="picH">
             </div>
           </div>
           
           <div class="btn-group" style="margin-bottom: 16px;">
-            <button class="btn btn-secondary" id="rotateBtn"><i class="fas fa-sync-alt"></i> Xoay</button>
-            <button class="btn btn-secondary" id="cloneBtn"><i class="fas fa-copy"></i> Nhân bản</button>
-            <button class="btn btn-danger" id="deleteBtn"><i class="fas fa-trash-alt"></i></button>
+            <button class="btn btn-secondary" id="rotateBtn"><i class="fas fa-sync-alt"></i> Xoay khung tranh</button>
+            <!-- Nút Kích thước chung mới -->
+            <button class="btn btn-secondary" id="commonSizeBtn" disabled title="Chỉ bật khi trên tường có duy nhất 1 bức tranh">Kích thước chung</button>
           </div>
 
-          <!-- Dpad Di chuyển -->
+          <!-- Mũi tên Di chuyển dàn hàng ngang -->
           <div style="border-top: 1px solid var(--color-border); padding-top: 16px; margin-top: 16px;">
-            <div class="form-group" style="display: flex; align-items: center; gap: 10px;">
+            <div class="form-group" style="display: flex; align-items: center; justify-content: space-between; gap: 10px;">
               <label class="form-label" style="margin:0; white-space: nowrap;">Bước di chuyển (cm):</label>
-              <input type="number" class="form-control" id="moveStep" value="1" min="0.1" step="0.1" style="padding: 6px; text-align: center;">
+              <input type="number" class="form-control" id="moveStep" value="1" min="0.1" step="0.1" style="padding: 6px; text-align: center; width: 80px;">
             </div>
             <div class="dpad-container">
-              <button class="dpad-btn dpad-up" id="navUp"><i class="fas fa-arrow-up"></i></button>
-              <button class="dpad-btn dpad-left" id="navLeft"><i class="fas fa-arrow-left"></i></button>
-              <button class="dpad-btn dpad-right" id="navRight"><i class="fas fa-arrow-right"></i></button>
-              <button class="dpad-btn dpad-down" id="navDown"><i class="fas fa-arrow-down"></i></button>
+              <button class="dpad-btn" id="navLeft"><i class="fas fa-arrow-left"></i></button>
+              <button class="dpad-btn" id="navUp"><i class="fas fa-arrow-up"></i></button>
+              <button class="dpad-btn" id="navDown"><i class="fas fa-arrow-down"></i></button>
+              <button class="dpad-btn" id="navRight"><i class="fas fa-arrow-right"></i></button>
             </div>
           </div>
         </div>
 
       </div>
 
-      <!-- TAB 4: KHÁC (Tùy chọn & Xuất) -->
+      <!-- TAB 3: KHÁC (Tùy chọn & Xuất) -->
       <div id="tab-khac" class="tab-content">
         <div class="panel-card">
           <h2 class="section-title">Công cụ hiển thị</h2>
@@ -449,7 +411,7 @@
             </label>
           </div>
 
-          <button class="btn btn-secondary" id="centerAllBtn" style="margin-bottom: 16px;">
+          <button class="btn btn-secondary" id="centerAllBtn" style="margin-bottom: 16px; width: 100%;">
             <i class="fas fa-align-center"></i> Tự động căn giữa toàn bộ
           </button>
 
@@ -505,7 +467,7 @@
       });
     });
 
-    /** --- GIỮ NGUYÊN CORE STATE TỪ CODE CŨ --- **/
+    /** --- CORE STATE --- **/
     const canvas = document.getElementById('canvas');
     const ctx = canvas.getContext('2d');
     const container = document.getElementById('canvasContainer');
@@ -521,6 +483,9 @@
     let globalImgData = null; 
     let isImgEditMode = false;
     let isDraggingImg = false;
+    
+    // Common Size Mode State
+    let isCommonSizeMode = false;
 
     // Interaction State
     let isDragging = false; 
@@ -549,7 +514,8 @@
        INITIALIZATION & EVENTS
        ========================================= */
     function init() {
-        createPics(3, 50, 70, 10);
+        // Khởi tạo 1 tranh mặc định ban đầu để người dùng dễ dùng tính năng "Kích thước chung"
+        createPics(1, 50, 70, 0);
         updateEditPanel(); 
         
         window.addEventListener('resize', () => {
@@ -560,10 +526,10 @@
         resizeCanvas();
         fitWallToScreen();
         
-        // Touch/Mobile Events (Ưu tiên mobile)
+        // Touch/Mobile Events
         setupTouchEvents();
         
-        // Desktop Events (Dự phòng)
+        // Desktop Events
         canvas.addEventListener('mousedown', onMouseDown);
         window.addEventListener('mousemove', onMouseMove);
         window.addEventListener('mouseup', onMouseUp);
@@ -582,7 +548,7 @@
     }
 
     function fitWallToScreen() {
-        const pad = 40; // Giảm padding cho mobile để thấy rõ hơn
+        const pad = 40; 
         const availableW = container.clientWidth - pad;
         const availableH = container.clientHeight - pad;
         
@@ -623,10 +589,8 @@
             if(e.cancelable) e.preventDefault(); 
             
             if(e.touches.length === 1) {
-                // Chạm 1 ngón: Kéo thả tranh hoặc Pan tường
                 onMouseDown(getTouchPos(e));
             } else if (e.touches.length === 2) {
-                // Chạm 2 ngón: Bắt đầu Zoom/Pan (Pinch)
                 pinchStartDist = getPinchDistance(e.touches);
                 pinchStartScale = app.scale;
                 
@@ -638,7 +602,6 @@
                 };
                 pinchStartPan = { x: app.panX, y: app.panY };
                 
-                // Hủy các trạng thái kéo thả 1 ngón để tránh lỗi
                 isDragging = false;
                 isPanning = false;
                 isDraggingImg = false;
@@ -646,24 +609,20 @@
         }, {passive: false});
 
         canvas.addEventListener('touchmove', (e) => {
-            if(e.cancelable) e.preventDefault(); // Ngăn cuộn trang khi vuốt trên canvas
+            if(e.cancelable) e.preventDefault(); 
             
             if(e.touches.length === 1 && pinchStartDist === 0) {
-                // Chỉ di chuyển 1 ngón nếu không phải đang zoom
                 onMouseMove(getTouchPos(e));
             } else if (e.touches.length === 2) {
-                // Xử lý Pinch to Zoom & Pan (2 ngón)
                 const currentDist = getPinchDistance(e.touches);
                 const zoomFactor = currentDist / pinchStartDist;
                 
                 let newScale = pinchStartScale * zoomFactor;
-                // Giới hạn zoom
                 if (newScale < 0.1) newScale = 0.1;
                 if (newScale > 10) newScale = 10;
                 
                 app.scale = newScale;
 
-                // Tính toán Pan để zoom tập trung vào đúng khoảng giữa 2 ngón tay
                 const rect = canvas.getBoundingClientRect();
                 const currentCenterScreen = getPinchCenter(e.touches);
                 const currentCenterX = currentCenterScreen.x - rect.left;
@@ -681,10 +640,9 @@
 
         canvas.addEventListener('touchend', (e) => {
             if (e.touches.length === 0) {
-                pinchStartDist = 0; // Reset trạng thái pinch
+                pinchStartDist = 0; 
                 onMouseUp();
             } else if (e.touches.length === 1) {
-                // Nhấc 1 ngón lên, giữ ngón còn lại -> reset kéo để tránh giật khung hình
                 isDragging = false;
                 isPanning = false;
                 isDraggingImg = false;
@@ -693,7 +651,6 @@
     }
 
     function setupUIControls() {
-        // Nút Fit View Mobile mới
         document.getElementById('resetViewBtnMobile').onclick = fitWallToScreen;
 
         const updateWall = () => { 
@@ -706,29 +663,6 @@
             fitWallToScreen(); saveState();
         };
         document.getElementById('updateWallBtn').onclick = updateWall;
-        
-        const updatePics = () => {
-            let count = parseInt(document.getElementById('picCount').value);
-            let w = parseInt(document.getElementById('commonW').value);
-            let h = parseInt(document.getElementById('commonH').value);
-            let gap = parseInt(document.getElementById('picGap').value);
-            
-            count = isNaN(count) || count < 1 ? 1 : count;
-            w = isNaN(w) || w < 10 ? 40 : w;
-            h = isNaN(h) || h < 10 ? 60 : h;
-            gap = isNaN(gap) || gap < 0 ? 0 : gap;
-
-            document.getElementById('picCount').value = count;
-            document.getElementById('commonW').value = w;
-            document.getElementById('commonH').value = h;
-            document.getElementById('picGap').value = gap;
-            createPics(count, w, h, gap); saveState();
-        };
-        document.getElementById('createBtn').onclick = updatePics;
-        
-        document.getElementById('resetBtn').onclick = () => {
-            if(confirm('Xóa hết tranh?')) { pictures = []; selectedPic = null; isGlobalMaskMode = false; globalImgData = null; updateEditPanel(); saveState(); }
-        };
 
         const updateFurn = () => {
             let fw = parseFloat(document.getElementById('furnW').value);
@@ -752,27 +686,81 @@
 
         document.getElementById('picW').onchange = updateSelectedSize;
         document.getElementById('picH').onchange = updateSelectedSize;
-        
-        const picIndexInput = document.getElementById('selectPicIndex');
-        const handleIndexSelect = () => {
-            const val = parseInt(picIndexInput.value);
-            if (isNaN(val) || val < 1 || val > pictures.length) {
-                picIndexInput.value = selectedPic ? pictures.indexOf(selectedPic) + 1 : '';
-                return;
-            }
-            const idx = val - 1;
-            if (pictures[idx]) { selectPicture(pictures[idx]); centerViewOnPic(pictures[idx]); }
-        };
-        picIndexInput.addEventListener('change', handleIndexSelect);
 
-        document.getElementById('cloneBtn').onclick = cloneSelectedPic;
-        document.getElementById('deleteBtn').onclick = () => {
-            if(!selectedPic) return;
-            pictures = pictures.filter(p => p !== selectedPic); 
-            selectedPic = null; 
-            if(pictures.length === 0) isGlobalMaskMode = false; 
-            updateEditPanel(); saveState();
+        // Xử lý nút Kích thước chung
+        document.getElementById('commonSizeBtn').onclick = () => {
+            if (pictures.length === 1) {
+                isCommonSizeMode = !isCommonSizeMode;
+                updateEditPanel();
+            }
         };
+
+        // Cấu hình Nút Nổi Copy trên Canvas
+        document.getElementById('floatCloneBtn').onclick = () => {
+            if (isCommonSizeMode && pictures.length === 1 && selectedPic) {
+                // Đang trong chế độ "Kích thước chung"
+                let countStr = prompt("Tạo bộ bao nhiêu tranh? (ví dụ: 3)", "3");
+                if (countStr === null) return; // Người dùng bấm Hủy
+                let count = parseInt(countStr);
+                if (isNaN(count) || count <= 1) {
+                    alert("Số lượng tranh phải lớn hơn 1.");
+                    isCommonSizeMode = false; updateEditPanel(); return;
+                }
+                
+                let gapStr = prompt("Khoảng cách giữa các tranh (cm):", "5");
+                if (gapStr === null) return; // Người dùng bấm Hủy
+                let gap = parseFloat(gapStr) || 0;
+
+                let startX = selectedPic.x;
+                let y = selectedPic.y;
+                let w = selectedPic.w;
+                let h = selectedPic.h;
+                let maxZ = selectedPic.z || 0;
+
+                // Tự động sinh ra các bức tranh tiếp theo dàn hàng ngang
+                for (let i = 1; i < count; i++) {
+                    const clone = {
+                        id: Date.now() + i,
+                        z: maxZ + i,
+                        x: startX + i * (w + gap),
+                        y: y,
+                        w: w,
+                        h: h,
+                        locked: false,
+                        imgData: null
+                    };
+                    pictures.push(clone);
+                }
+                
+                // Sau khi tạo xong bộ thì tắt mode và căn giữa tự động
+                isCommonSizeMode = false;
+                centerAllContent();
+                updateEditPanel();
+                saveState();
+            } else {
+                // Nhận bản (Copy) bình thường 1 bức
+                cloneSelectedPic();
+            }
+        };
+        
+        // Cấu hình Nút Nổi Delete trên Canvas
+        document.getElementById('floatDeleteBtn').onclick = () => {
+            if (isImgEditMode) {
+                // Xóa ảnh
+                if (isGlobalMaskMode) globalImgData = null;
+                else if (selectedPic) selectedPic.imgData = null;
+            } else {
+                // Xóa tranh
+                if (selectedPic && !selectedPic.locked) {
+                    pictures = pictures.filter(p => p !== selectedPic); 
+                    selectedPic = null; 
+                    if(pictures.length === 0) isGlobalMaskMode = false; 
+                }
+            }
+            updateEditPanel(); 
+            saveState();
+        };
+
         document.getElementById('rotateBtn').onclick = () => {
             if(!selectedPic) return;
             [selectedPic.w, selectedPic.h] = [selectedPic.h, selectedPic.w];
@@ -829,12 +817,6 @@
             updateEditPanel(); saveState();
         };
 
-        document.getElementById('deleteImgBtn').onclick = () => {
-            if (isGlobalMaskMode) globalImgData = null;
-            else if (selectedPic) selectedPic.imgData = null;
-            updateEditPanel(); saveState();
-        };
-
         document.getElementById('undoBtn').onclick = undo;
         document.getElementById('redoBtn').onclick = redo;
         document.getElementById('exportJpegBtn').onclick = () => downloadImage('jpeg');
@@ -842,7 +824,7 @@
     }
 
     /* =========================================
-       LOGIC XỬ LÝ ẢNH, CANVAS, XUẤT FILE (GIỮ NGUYÊN)
+       LOGIC XỬ LÝ ẢNH, CANVAS, XUẤT FILE 
        ========================================= */
     function handleFileUpload(e) {
         const file = e.target.files[0];
@@ -1002,15 +984,30 @@
                         targetsY.push({val: p.y, type:'edge'}, {val: p.y+p.h/2, type:'center'}, {val: p.y+p.h, type:'edge'});
                     });
 
+                    let snappedX = false;
                     for(let edge of edgesX) {
                         for(let t of targetsX) {
-                            if(Math.abs(edge - t.val) < threshold) { newX += t.val - edge; activeGuides.push({type:'v', x: t.val}); break; }
+                            if(Math.abs(edge - t.val) < threshold) { 
+                                newX += t.val - edge; 
+                                activeGuides.push({type:'v', x: t.val}); 
+                                snappedX = true; 
+                                break; 
+                            }
                         }
+                        if (snappedX) break; 
                     }
+
+                    let snappedY = false;
                     for(let edge of edgesY) {
                         for(let t of targetsY) {
-                            if(Math.abs(edge - t.val) < threshold) { newY += t.val - edge; activeGuides.push({type:'h', y: t.val}); break; }
+                            if(Math.abs(edge - t.val) < threshold) { 
+                                newY += t.val - edge; 
+                                activeGuides.push({type:'h', y: t.val}); 
+                                snappedY = true; 
+                                break; 
+                            }
                         }
+                        if (snappedY) break; 
                     }
                 }
                 selectedPic.x = newX; selectedPic.y = newY;
@@ -1221,14 +1218,62 @@
     }
 
     function updateEditPanel() {
-        const panel = document.getElementById('editPanel'), selectIndexInput = document.getElementById('selectPicIndex');
+        const panel = document.getElementById('editPanel');
+        
+        // Cập nhật trạng thái các nút nổi
+        const floatCloneBtn = document.getElementById('floatCloneBtn');
+        const floatDeleteBtn = document.getElementById('floatDeleteBtn');
+        const commonSizeBtn = document.getElementById('commonSizeBtn');
+
+        // Logic ẩn/hiện nút "Kích thước chung"
+        if (pictures.length === 1) {
+            commonSizeBtn.disabled = false;
+        } else {
+            commonSizeBtn.disabled = true;
+            isCommonSizeMode = false; // Tự động tắt mode nếu không đủ điều kiện
+        }
+        
+        // Đổi màu nút Kích thước chung khi đang kích hoạt
+        if (isCommonSizeMode) {
+            commonSizeBtn.classList.add('btn-primary');
+            commonSizeBtn.classList.remove('btn-secondary');
+        } else {
+            commonSizeBtn.classList.add('btn-secondary');
+            commonSizeBtn.classList.remove('btn-primary');
+        }
+
         if(selectedPic) {
             panel.style.opacity = '1'; panel.style.pointerEvents = 'auto';
-            document.getElementById('picW').value = Math.round(selectedPic.w); document.getElementById('picH').value = Math.round(selectedPic.h);
-            selectIndexInput.value = pictures.indexOf(selectedPic) + 1;
+            document.getElementById('picW').value = Math.round(selectedPic.w); 
+            document.getElementById('picH').value = Math.round(selectedPic.h);
+            
+            floatCloneBtn.disabled = false;
+            floatDeleteBtn.disabled = false;
+            
+            // Đổi màu nút Clone nếu đang trong mode "Kích thước chung" để người dùng dễ nhận biết
+            if (isCommonSizeMode) {
+                floatCloneBtn.style.color = 'var(--color-primary)';
+                floatCloneBtn.style.borderColor = 'var(--color-primary)';
+            } else {
+                floatCloneBtn.style.color = 'var(--color-text-primary)';
+                floatCloneBtn.style.borderColor = 'rgba(255,255,255,0.1)';
+            }
+
         } else {
             panel.style.opacity = '0.5'; panel.style.pointerEvents = 'none';
-            selectIndexInput.value = ''; document.getElementById('picW').value = ''; document.getElementById('picH').value = '';
+            document.getElementById('picW').value = ''; 
+            document.getElementById('picH').value = '';
+
+            floatCloneBtn.disabled = true;
+            floatCloneBtn.style.color = 'var(--color-text-primary)';
+            floatCloneBtn.style.borderColor = 'rgba(255,255,255,0.1)';
+            
+            // Xóa ảnh nền global mask vẫn được phép nếu không chọn tranh nào
+            if (isImgEditMode && isGlobalMaskMode && globalImgData) {
+                floatDeleteBtn.disabled = false;
+            } else {
+                floatDeleteBtn.disabled = true;
+            }
         }
 
         document.getElementById('globalImgToggle').checked = isGlobalMaskMode;
